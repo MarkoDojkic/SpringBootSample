@@ -13,7 +13,7 @@ databaseChangeLog:
       changes:
         - createSequence:
             sequenceName: integration_message_seq
-            startValue: 1
+            startValue: 2
             incrementBy: 1
         - createTable:
             tableName: integration_message
@@ -32,12 +32,12 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: created_at
-                  type: timestamp
+                  type: "TIMESTAMP WITH TIME ZONE"
                   constraints:
                     nullable: false
               - column:
                   name: updated_at
-                  type: timestamp
+                  type: "TIMESTAMP WITH TIME ZONE"
                   constraints:
                     nullable: false
         - insert:
@@ -102,10 +102,10 @@ databaseChangeLog:
                   type: varchar(512)
               - column:
                   name: created_at
-                  type: timestamp
+                  type: "TIMESTAMP WITH TIME ZONE"
               - column:
                   name: updated_at
-                  type: timestamp
+                  type: "TIMESTAMP WITH TIME ZONE"
         - addPrimaryKey:
             tableName: integration_message_aud
             columnNames: id, rev

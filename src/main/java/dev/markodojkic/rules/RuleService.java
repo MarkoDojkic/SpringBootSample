@@ -21,7 +21,7 @@ public class RuleService {
 
     public record RuleResult(int age, String category) {}
 
-    @Cacheable(cacheNames = "rule-evaluations", key = "#age")
+    @Cacheable(cacheNames = "rule-evaluations", key = "#p0")
     public RuleResult evaluate(int age) {
         RuleInput input = new RuleInput(age);
         KieServices ks = KieServices.Factory.get();

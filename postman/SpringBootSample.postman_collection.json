@@ -257,6 +257,31 @@
       }
     },
     {
+      "name": "SOAP Check Eligibility",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "text/xml; charset=utf-8"
+          },
+          {
+            "key": "SOAPAction",
+            "value": "\"\""
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:soap=\"http://soap.markodojkic.dev/\"><soapenv:Header/><soapenv:Body><soap:checkEligibility><arg0>{{patientId}}</arg0></soap:checkEligibility></soapenv:Body></soapenv:Envelope>"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/services/eligibility",
+          "host": ["{{baseUrl}}"],
+          "path": ["services", "eligibility"]
+        }
+      }
+    },
+    {
       "name": "OpenAPI JSON",
       "request": {
         "method": "GET",
@@ -271,19 +296,14 @@
     {
       "name": "gRPC Check Eligibility",
       "request": {
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"patientId\": \"123\"\n        }"
-        },
-        "url": {
-          "raw": "{{grpcUrl}}",
-          "host": ["{{grpcUrl}}"]
+        "url": "{{grpcUrl}}",
+        "protocol": "grpc",
+        "grpc": {
+          "method": "EligibilityGrpcService/CheckEligibility",
+          "body": {
+            "patient_id": "123"
+          }
         }
-      },
-      "protocolProfileBehavior": {
-        "disableBodyPruning": true
       }
     }
   ]
