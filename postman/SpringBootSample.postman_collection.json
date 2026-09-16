@@ -121,6 +121,73 @@
       }
     },
     {
+      "name": "List integration messages",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/messages",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "messages"]
+        }
+      }
+    },
+    {
+      "name": "Create integration message",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"message\": \"hello from Postman\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/messages",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "messages"]
+        }
+      }
+    },
+    {
+      "name": "Update integration message",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"message\": \"updated from Postman\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/messages/1",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "messages", "1"]
+        }
+      }
+    },
+    {
       "name": "Generate JasperReports PDF",
       "request": {
         "method": "GET",
