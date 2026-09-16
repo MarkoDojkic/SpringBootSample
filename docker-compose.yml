@@ -147,7 +147,7 @@ services:
     ports:
       - "10389:389"
     volumes:
-      - ./ldap/bootstrap.ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom/01-demo.ldif:ro
+      - ./ldap/bootstrap.ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom/01-demo.ldif
     healthcheck:
       test: ["CMD-SHELL", "ldapsearch -x -H ldap://127.0.0.1:389 -D cn=admin,dc=example,dc=org -w admin -b dc=example,dc=org -s base >/dev/null 2>&1"]
       interval: 10s
