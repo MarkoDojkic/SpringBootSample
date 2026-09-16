@@ -101,6 +101,7 @@ if [[ -n "$TOKEN" ]]; then
     -H "$AUTH_HEADER"
   http_check "FHIR patient creation" \
     "$BASE_URL/api/fhir/patient?familyName=Smoke${RUN_ID}&givenName=Integration" \
+    -X POST \
     -H "$AUTH_HEADER"
 
   MESSAGE_RESPONSE="$(curl -fsS -X POST "$BASE_URL/api/messages" \
