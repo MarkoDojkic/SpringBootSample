@@ -1,0 +1,15 @@
+package rules
+
+rule "Adult"
+when
+    $p : dev.markodojkic.rules.RuleService.RuleInput(age >= 18, age < 65)
+then
+    // Business-rule example; application maps the resulting input to a category.
+end
+
+rule "Senior"
+when
+    $p : dev.markodojkic.rules.RuleService.RuleInput(age >= 65)
+then
+    // Business-rule example.
+end

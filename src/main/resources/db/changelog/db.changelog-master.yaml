@@ -1,0 +1,36 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: marko
+      changes:
+        - createTable:
+            tableName: integration_message
+            columns:
+              - column:
+                  name: id
+                  type: varchar(64)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: message
+                  type: varchar(512)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+        - insert:
+            tableName: integration_message
+            columns:
+              - column:
+                  name: id
+                  value: seed-1
+              - column:
+                  name: message
+                  value: Initial integration data
+              - column:
+                  name: created_at
+                  valueDate: 2026-01-01T00:00:00

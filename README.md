@@ -1,0 +1,80 @@
+# Spring Boot Enterprise Integration Stack
+
+Reference application built for **Java 17** and Spring Boot 3.5.16. It combines the capabilities demonstrated by this project and `SOAP_Learning-main` without requiring the Kotlin application.
+
+## Included stack
+
+- Spring Web, Validation, Security, AOP, Actuator, JDBC, Quartz, and JPA-compatible datasource configuration
+- HikariCP (default) and C3P0 profiles
+- Spring Cloud Eureka client/server and OpenFeign
+- RabbitMQ and Apache Kafka
+- Jackson, JJWT, Jasypt, Bouncy Castle, and OAuth2 resource-server dependencies
+- Drools/KIE rules
+- HAPI FHIR R4
+- Apache CXF SOAP
+- gRPC with protobuf-generated service stubs
+- Spring Cloud Config Server
+- Oracle Database with Liquibase migrations and seed data
+- Optional LDAP authentication
+- AspectJ compile-time weaving (CTW)
+- SpringDoc OpenAPI and Micrometer Prometheus metrics
+- JasperReports **7.0.8** PDF reporting
+- JUnit 5, Mockito, and Spring Security test support
+
+## Requirements
+
+- JDK 17
+- Maven 3.9+ or Docker
+- Docker Compose for RabbitMQ, Kafka, Eureka, Config Server, Oracle, and LDAP
+- Keycloak is also started by Compose for OAuth2 experiments (`admin` / `admin`)
+
+## Run with Docker Compose
+
+From this directory:
+
+```bash
+docker compose up --build
+```
+
+Services and endpoints:
+
+| Service | URL |
+|---|---|
+| Enterprise application | http://localhost:8080 |
+| gRPC endpoint | localhost:9090 |
+| Config Server | http://localhost:8888 |
+| Health | http://localhost:8080/actuator/health |
+| Prometheus metrics | http://localhost:8080/actuator/prometheus |
+| OpenAPI UI | http://localhost:8080/swagger-ui.html |
+| SOAP WSDL | http://localhost:8080/services/eligibility?wsdl |
+| Eureka | http://localhost:8761 |
+| RabbitMQ management | http://localhost:15672 (`guest` / `guest`) |
+| Keycloak | http://localhost:8081 |
+| Oracle | localhost:1521/FREEPDB1 (`enterprise` / `enterprise`) |
+| LDAP | ldap://localhost:10389 (`cn=admin,dc=example,dc=org` / `admin`) |
+
+## Run locally
+
+Start Eureka and RabbitMQ/Kafka, then run:
+
+```bash
+mvn test
+mvn spring-boot:run
+```
+
+The default datasource profile is HikariCP. To use C3P0:
+
+```bash
+mvn spring-boot:run -Dspring-boot.run.profiles=c3p0
+```
+
+## API examples
+
+```text
+POST /api/auth/token?username=marko
+POST /api/fhir/patient?familyName=Doe&givenName=Jane
+GET  /api/rules/evaluate?age=42
+GET  /api/reports/eligibility?patientId=123
+```
+
+The report endpoint returns a JasperReports-generated PDF. Liquibase creates and seeds `integration_message` on startup. LDAP is enabled in Compose and can be disabled locally with `APP_LDAP_ENABLED=false`. Replace development secrets and externalize credentials before production use.

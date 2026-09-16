@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "dev.markodojkic.grpc";
+option java_outer_classname = "EligibilityProtocol";
+
+service EligibilityGrpcService {
+  rpc CheckEligibility (EligibilityRequest) returns (EligibilityResponse);
+}
+
+message EligibilityRequest {
+  string patient_id = 1;
+}
+
+message EligibilityResponse {
+  string patient_id = 1;
+  bool eligible = 2;
+  string message = 3;
+}
