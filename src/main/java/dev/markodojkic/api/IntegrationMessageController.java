@@ -3,6 +3,7 @@ package dev.markodojkic.api;
 import dev.markodojkic.model.IntegrationMessage;
 import dev.markodojkic.model.IntegrationMessageRepository;
 import java.util.List;
+import dev.markodojkic.model.IntegrationMessageSpecifications;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,10 +28,16 @@ public class IntegrationMessageController {
         return repository.findAll();
     }
 
+    @GetMapping("/search")
+    public List<IntegrationMessage> search(@org.springframework.web.bind.annotation.RequestParam String text) {
+        return repository.findAll(IntegrationMessageSpecifications.messageContains(text));
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public IntegrationMessage create(@RequestBody CreateMessageRequest request) {
-        return repository.save(new IntegrationMessage(request.message()));
+        return repository.save(new IntegrationMessage(
+                request.message(), request.secretText(), request.secretDate(), request.secretBytes()));
     }
 
     @PutMapping("/{id}")
@@ -41,6 +48,10 @@ public class IntegrationMessageController {
         return repository.save(message);
     }
 
-    public record CreateMessageRequest(String message) {
+    public record CreateMessageRequest(
+            String message,
+            String secretText,
+            java.time.Instant secretDate,
+            byte[] secretBytes) {
     }
 }

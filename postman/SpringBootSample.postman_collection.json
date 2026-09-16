@@ -153,12 +153,35 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"message\": \"hello from Postman\"\n}"
+          "raw": "{\n  \"message\": \"hello from Postman\",\n  \"secretText\": \"private value\",\n  \"secretDate\": \"2026-01-01T00:00:00Z\",\n  \"secretBytes\": \"c2Vuc2l0aXZl\"\n}"
         },
         "url": {
           "raw": "{{baseUrl}}/api/messages",
           "host": ["{{baseUrl}}"],
           "path": ["api", "messages"]
+        }
+      }
+    },
+    {
+      "name": "Search integration messages with Criteria API",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/messages/search?text=hello",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "messages", "search"],
+          "query": [
+            {
+              "key": "text",
+              "value": "hello"
+            }
+          ]
         }
       }
     },

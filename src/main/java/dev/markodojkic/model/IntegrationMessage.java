@@ -13,6 +13,10 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.hibernate.envers.Audited;
+import jakarta.persistence.Convert;
+import dev.markodojkic.persistence.EncryptedBytesConverter;
+import dev.markodojkic.persistence.EncryptedInstantConverter;
+import dev.markodojkic.persistence.EncryptedStringConverter;
 
 @Entity
 @Audited
@@ -38,11 +42,30 @@ public class IntegrationMessage {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
+    @Convert(converter = EncryptedStringConverter.class)
+    @Column(name = "secret_text", length = 2048)
+    private String secretText;
+
+    @Convert(converter = EncryptedInstantConverter.class)
+    @Column(name = "secret_date", length = 512)
+    private Instant secretDate;
+
+    @Convert(converter = EncryptedBytesConverter.class)
+    @Column(name = "secret_bytes", length = 4096)
+    private byte[] secretBytes;
+
     protected IntegrationMessage() {
     }
 
     public IntegrationMessage(String message) {
         this.message = message;
+    }
+
+    public IntegrationMessage(String message, String secretText, Instant secretDate, byte[] secretBytes) {
+        this.message = message;
+        this.secretText = secretText;
+        this.secretDate = secretDate;
+        this.secretBytes = secretBytes;
     }
 
     public Long getId() {
@@ -63,5 +86,17 @@ public class IntegrationMessage {
 
     public Instant getUpdatedAt() {
         return updatedAt;
+    }
+
+    public String getSecretText() {
+        return secretText;
+    }
+
+    public Instant getSecretDate() {
+        return secretDate;
+    }
+
+    public byte[] getSecretBytes() {
+        return secretBytes;
     }
 }

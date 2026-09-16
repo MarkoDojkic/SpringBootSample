@@ -26,6 +26,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: enterprise
       SPRING_DATASOURCE_DRIVER: oracle.jdbc.OracleDriver
       SPRING_LIQUIBASE_ENABLED: "true"
+      JASYPT_ENCRYPTOR_PASSWORD: ${JASYPT_ENCRYPTOR_PASSWORD:?Set JASYPT_ENCRYPTOR_PASSWORD in .env}
       APP_LDAP_ENABLED: "true"
       LDAP_URL: ldap://openldap:389
       LDAP_BASE: dc=example,dc=org

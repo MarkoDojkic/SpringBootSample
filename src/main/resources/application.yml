@@ -74,5 +74,6 @@ management:
 
 jasypt:
   encryptor:
+    password: ${JASYPT_ENCRYPTOR_PASSWORD}
     algorithm: PBEWITHHMACSHA512ANDAES_256
     iv-generator-classname: org.jasypt.iv.RandomIvGenerator

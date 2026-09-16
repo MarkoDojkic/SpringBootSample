@@ -101,6 +101,34 @@ databaseChangeLog:
             referencedColumnNames: rev
             constraintName: fk_integration_message_aud_revinfo
   - changeSet:
+      id: 4
+      author: marko
+      changes:
+        - addColumn:
+            tableName: integration_message
+            columns:
+              - column:
+                  name: secret_text
+                  type: varchar(2048)
+              - column:
+                  name: secret_date
+                  type: varchar(512)
+              - column:
+                  name: secret_bytes
+                  type: varchar(4096)
+        - addColumn:
+            tableName: integration_message_aud
+            columns:
+              - column:
+                  name: secret_text
+                  type: varchar(2048)
+              - column:
+                  name: secret_date
+                  type: varchar(512)
+              - column:
+                  name: secret_bytes
+                  type: varchar(4096)
+  - changeSet:
       id: 3
       author: marko
       changes:
