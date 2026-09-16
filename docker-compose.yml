@@ -137,7 +137,9 @@ services:
       start_period: 120s
 
   openldap:
-    image: osixia/openldap:1.5.0
+    build:
+      context: ./ldap
+      dockerfile: Dockerfile
     restart: unless-stopped
     environment:
       LDAP_ORGANISATION: Example
@@ -146,8 +148,6 @@ services:
       LDAP_TLS: "false"
     ports:
       - "10389:389"
-    volumes:
-      - ./ldap/bootstrap.ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom/01-demo.ldif
     healthcheck:
       test: ["CMD-SHELL", "ldapsearch -x -H ldap://127.0.0.1:389 -D cn=admin,dc=example,dc=org -w admin -b dc=example,dc=org -s base >/dev/null 2>&1"]
       interval: 10s
