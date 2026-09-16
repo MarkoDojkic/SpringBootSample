@@ -2,6 +2,14 @@ databaseChangeLog:
   - changeSet:
       id: 1
       author: marko
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: integration_message
+        - not:
+            - sequenceExists:
+                sequenceName: integration_message_seq
       changes:
         - createSequence:
             sequenceName: integration_message_seq
@@ -47,6 +55,14 @@ databaseChangeLog:
   - changeSet:
       id: 2
       author: marko
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: revinfo
+        - not:
+            - tableExists:
+                tableName: integration_message_aud
       changes:
         - createTable:
             tableName: revinfo
@@ -103,6 +119,12 @@ databaseChangeLog:
   - changeSet:
       id: 4
       author: marko
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - columnExists:
+                tableName: integration_message
+                columnName: secret_text
       changes:
         - addColumn:
             tableName: integration_message
@@ -116,6 +138,16 @@ databaseChangeLog:
               - column:
                   name: secret_bytes
                   type: blob
+  - changeSet:
+      id: 6
+      author: marko
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - columnExists:
+                tableName: integration_message_aud
+                columnName: secret_text
+      changes:
         - addColumn:
             tableName: integration_message_aud
             columns:
@@ -129,8 +161,61 @@ databaseChangeLog:
                   name: secret_bytes
                   type: blob
   - changeSet:
+      id: 7
+      author: marko
+      preConditions:
+        - onFail: HALT
+        - columnExists:
+            tableName: integration_message
+            columnName: secret_text
+        - columnExists:
+            tableName: integration_message
+            columnName: secret_date
+        - columnExists:
+            tableName: integration_message
+            columnName: secret_bytes
+        - columnExists:
+            tableName: integration_message_aud
+            columnName: secret_text
+        - columnExists:
+            tableName: integration_message_aud
+            columnName: secret_date
+        - columnExists:
+            tableName: integration_message_aud
+            columnName: secret_bytes
+      changes:
+        - modifyDataType:
+            tableName: integration_message
+            columnName: secret_text
+            newDataType: clob
+        - modifyDataType:
+            tableName: integration_message
+            columnName: secret_date
+            newDataType: clob
+        - modifyDataType:
+            tableName: integration_message
+            columnName: secret_bytes
+            newDataType: blob
+        - modifyDataType:
+            tableName: integration_message_aud
+            columnName: secret_text
+            newDataType: clob
+        - modifyDataType:
+            tableName: integration_message_aud
+            columnName: secret_date
+            newDataType: clob
+        - modifyDataType:
+            tableName: integration_message_aud
+            columnName: secret_bytes
+            newDataType: blob
+  - changeSet:
       id: 3
       author: marko
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - sequenceExists:
+                sequenceName: revinfo_seq
       changes:
         - createSequence:
             sequenceName: revinfo_seq
