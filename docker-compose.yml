@@ -118,6 +118,8 @@ services:
       ORACLE_PASSWORD: oracle
       APP_USER: enterprise
       APP_USER_PASSWORD: enterprise
+    volumes:
+      - ./oracle/force-ipv4-listener.sh:/container-entrypoint-startdb.d/99-force-ipv4-listener.sh:ro
     ports:
       - "1521:1521"
     healthcheck:
