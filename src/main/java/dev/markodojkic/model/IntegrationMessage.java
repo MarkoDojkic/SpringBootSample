@@ -6,6 +6,7 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import java.time.Instant;
@@ -43,15 +44,18 @@ public class IntegrationMessage {
     private Instant updatedAt;
 
     @Convert(converter = EncryptedStringConverter.class)
-    @Column(name = "secret_text", length = 2048)
+    @Lob
+    @Column(name = "secret_text")
     private String secretText;
 
     @Convert(converter = EncryptedInstantConverter.class)
-    @Column(name = "secret_date", length = 512)
+    @Lob
+    @Column(name = "secret_date")
     private Instant secretDate;
 
     @Convert(converter = EncryptedBytesConverter.class)
-    @Column(name = "secret_bytes", length = 4096)
+    @Lob
+    @Column(name = "secret_bytes")
     private byte[] secretBytes;
 
     protected IntegrationMessage() {
