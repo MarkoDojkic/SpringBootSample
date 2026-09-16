@@ -90,3 +90,22 @@ GET  /api/reports/eligibility?patientId=123
 ```
 
 The report endpoint returns a JasperReports-generated PDF. Liquibase creates and seeds `integration_message` on startup. LDAP is enabled in Compose and can be disabled locally with `APP_LDAP_ENABLED=false`. Replace development secrets and externalize credentials before production use.
+
+## Postman and gRPC
+
+Import `postman/SpringBootSample.postman_collection.json` into Postman Desktop. Run **Get development JWT** first; its test script stores the token for the protected requests. Update the collection `baseUrl` variable when Codespaces assigns a different forwarded application URL.
+
+Postman Desktop supports gRPC. The collection includes a request using the forwarded `9090` host. Use server reflection and select `EligibilityGrpcService/CheckEligibility`, then send:
+
+```json
+{
+  "patientId": "123"
+}
+```
+
+Alternatively install `grpcurl` on Windows with and use the forwarded host:
+
+```powershell
+winget install grpcurl.grpcurl
+grpcurl -insecure turbo-tribble-rp6555q77jpfp5jq-9090.app.github.dev:443 list
+```
