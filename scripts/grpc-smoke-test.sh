@@ -10,15 +10,15 @@ grpcurl() {
 }
 
 echo "Checking gRPC reflection at ${GRPC_TARGET}..."
-grpcurl -plaintext -max-time 10s "$GRPC_TARGET" list
+grpcurl -plaintext -max-time 10 "$GRPC_TARGET" list
 
 echo "Checking gRPC health..."
-grpcurl -plaintext -max-time 10s \
+grpcurl -plaintext -max-time 10 \
   -d '{"service":""}' \
   "$GRPC_TARGET" grpc.health.v1.Health/Check
 
 echo "Calling EligibilityGrpcService/CheckEligibility for patient ${PATIENT_ID}..."
-grpcurl -plaintext -max-time 10s \
+grpcurl -plaintext -max-time 10 \
   -d "{\"patient_id\":\"${PATIENT_ID}\"}" \
   "$GRPC_TARGET" EligibilityGrpcService/CheckEligibility
 
