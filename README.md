@@ -39,23 +39,28 @@ Build all JARs locally first:
 mvn clean package -DskipTests
 mvn -f discovery-server/pom.xml package -DskipTests
 mvn -f config-server/pom.xml package -DskipTests
+mvn -f rules-service/pom.xml package -DskipTests
+mvn -f gateway/pom.xml package -DskipTests
 ```
 
 Then build the runtime images and start the stack:
 
 ```bash
-docker compose build --no-cache enterprise-service
+docker compose build --no-cache
 docker compose up -d
 ```
 
 Compose does not run Maven. The Dockerfiles only copy the existing JARs from
-`target/`, `discovery-server/target/`, and `config-server/target/`.
+`target/`, `discovery-server/target/`, `config-server/target/`,
+`rules-service/target/`, and `gateway/target/`.
 
 Services and endpoints:
 
 | Service | URL |
 |---|---|
 | Enterprise application | http://localhost:8080 |
+| Spring Cloud Gateway | http://localhost:8088 |
+| Rules service | http://localhost:8090 |
 | gRPC endpoint | localhost:9090 |
 | Config Server | http://localhost:8888 |
 | Health | http://localhost:8080/actuator/health |
@@ -100,6 +105,11 @@ POST /api/integrations/events {"message":"hello from both brokers"}
 ```
 
 The report endpoint returns a JasperReports-generated PDF. Liquibase creates and seeds `integration_message` on startup. LDAP is enabled in Compose and can be disabled locally with `APP_LDAP_ENABLED=false`. Replace development secrets and externalize credentials before production use.
+
+The enterprise application, rules service, and Spring Cloud Gateway register with
+Eureka. The enterprise application resolves `rules-service` through Eureka
+using OpenFeign, and the gateway routes `/api/rules/**` to the discovered rules
+service and other application routes to `enterprise-service`.
 
 ## Integration verification
 
@@ -177,7 +187,7 @@ The `secretText`, `secretDate`, and `secretBytes` entity columns are encrypted b
 
 ## Postman and gRPC
 
-Import `postman/SpringBootSample.postman_collection.json` into Postman Desktop. Run **Get development JWT** first; its test script stores the token for the protected requests. Update the collection `baseUrl` variable when Codespaces assigns a different forwarded application URL.
+Import `postman/SpringBootSample.postman_collection.json` into Postman Desktop. All HTTP requests use the Spring Cloud Gateway proxy on port `8088`. Run **Get development JWT** first; its test script stores the token for the protected requests. Update the collection `baseUrl` and `gatewayUrl` variables when Codespaces assigns a different forwarded gateway URL.
 
 Postman Desktop supports gRPC. The collection includes a request using the forwarded `9090` host. Use server reflection and select `EligibilityGrpcService/CheckEligibility`, then send:
 

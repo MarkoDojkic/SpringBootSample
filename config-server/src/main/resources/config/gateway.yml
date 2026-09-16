@@ -1,0 +1,12 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: rules-service
+          uri: lb://RULES-SERVICE
+          predicates:
+            - Path=/api/rules/**
+        - id: enterprise-service
+          uri: lb://ENTERPRISE-SERVICE
+          predicates:
+            - Path=/api/**,/services/**,/actuator/**,/v3/api-docs/**

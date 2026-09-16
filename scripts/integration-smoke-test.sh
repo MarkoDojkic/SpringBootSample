@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -uo pipefail
 
-BASE_URL="${BASE_URL:-http://localhost:8080}"
+PROXY_URL="${PROXY_URL:-http://localhost:8088}"
+DIRECT_URL="${DIRECT_URL:-http://localhost:8080}"
 KEYCLOAK_URL="${KEYCLOAK_URL:-http://localhost:8081}"
 POOL_PROFILE="${POOL_PROFILE:-hikari}"
 LOG_DIR="${LOG_DIR:-logs}"
@@ -73,8 +74,9 @@ log "Datasource profile: $POOL_PROFILE"
 log "Log file: $LOG_FILE"
 
 run_check "Compose services are running" docker compose ps
-http_check "Application health" "$BASE_URL/actuator/health"
-http_check "Prometheus metrics" "$BASE_URL/actuator/prometheus"
+http_check "Direct enterprise health" "$DIRECT_URL/actuator/health"
+http_check "Gateway health" "$PROXY_URL/actuator/health"
+http_check "Prometheus metrics through Gateway" "$PROXY_URL/actuator/prometheus"
 
 if TOKEN_RESPONSE="$(curl -fsS -X POST \
   "$KEYCLOAK_URL/realms/master/protocol/openid-connect/token" \
@@ -95,16 +97,16 @@ fi
 if [[ -n "$TOKEN" ]]; then
   AUTH_HEADER="Authorization: Bearer $TOKEN"
 
-  http_check "Keycloak-secured API" "$BASE_URL/api/messages" \
+  http_check "Keycloak-secured API through Gateway" "$PROXY_URL/api/messages" \
     -H "$AUTH_HEADER"
-  http_check "Drools rule evaluation" "$BASE_URL/api/rules/evaluate?age=42" \
+  http_check "Drools rule evaluation through Gateway" "$PROXY_URL/api/rules/evaluate?age=42" \
     -H "$AUTH_HEADER"
   http_check "FHIR patient creation" \
-    "$BASE_URL/api/fhir/patient?familyName=Smoke${RUN_ID}&givenName=Integration" \
+    "$PROXY_URL/api/fhir/patient?familyName=Smoke${RUN_ID}&givenName=Integration" \
     -X POST \
     -H "$AUTH_HEADER"
 
-  MESSAGE_RESPONSE="$(curl -fsS -X POST "$BASE_URL/api/messages" \
+  MESSAGE_RESPONSE="$(curl -fsS -X POST "$PROXY_URL/api/messages" \
     -H "$AUTH_HEADER" \
     -H "Content-Type: application/json" \
     --data "{\"message\":\"integration-smoke-${RUN_ID}\",\"secretText\":\"smoke-${RUN_ID}\",\"secretDate\":\"2026-01-01T00:00:00Z\",\"secretBytes\":\"c21va2U=\"}" \
@@ -119,18 +121,18 @@ if [[ -n "$TOKEN" ]]; then
 
   if [[ -n "$MESSAGE_ID" ]]; then
     http_check "Update integration message" \
-      "$BASE_URL/api/messages/$MESSAGE_ID" \
+      "$PROXY_URL/api/messages/$MESSAGE_ID" \
       -X PUT \
       -H "$AUTH_HEADER" \
       -H "Content-Type: application/json" \
       --data "{\"message\":\"integration-smoke-updated-${RUN_ID}\"}"
     http_check "Search integration messages" \
-      "$BASE_URL/api/messages/search?text=integration-smoke-updated-${RUN_ID}" \
+      "$PROXY_URL/api/messages/search?text=integration-smoke-updated-${RUN_ID}" \
       -H "$AUTH_HEADER"
   fi
 
   http_check "JasperReports PDF endpoint" \
-    "$BASE_URL/api/reports/eligibility?patientId=smoke-test" \
+    "$PROXY_URL/api/reports/eligibility?patientId=smoke-test" \
     -H "$AUTH_HEADER" \
     -o "$PDF_FILE"
 
@@ -140,7 +142,7 @@ if [[ -n "$TOKEN" ]]; then
     fail "Generated file is a PDF (see $LOG_FILE)"
   fi
 
-  EVENT_RESPONSE="$(curl -fsS -X POST "$BASE_URL/api/integrations/events" \
+  EVENT_RESPONSE="$(curl -fsS -X POST "$PROXY_URL/api/integrations/events" \
     -H "$AUTH_HEADER" \
     -H "Content-Type: application/json" \
     --data "{\"message\":\"broker-smoke-${RUN_ID}\"}" \
@@ -165,15 +167,15 @@ else
   skip "Authenticated API, message CRUD, JasperReports, and broker endpoint"
 fi
 
-http_check "LDAP authentication" "$BASE_URL/api/messages" \
+http_check "LDAP authentication through Gateway" "$PROXY_URL/api/messages" \
   -u demo-user:demo-password
 http_check "Eureka registration" \
   "http://localhost:8761/eureka/apps/enterprise-service"
 http_check "Config Server profile" \
   "http://localhost:8888/enterprise-service/hikari"
-http_check "OpenAPI JSON" "$BASE_URL/v3/api-docs"
-http_check "SOAP WSDL" "$BASE_URL/services/eligibility?wsdl"
-http_check "SOAP eligibility operation" "$BASE_URL/services/eligibility" \
+http_check "OpenAPI JSON through Gateway" "$PROXY_URL/v3/api-docs"
+http_check "SOAP WSDL through Gateway" "$PROXY_URL/services/eligibility?wsdl"
+http_check "SOAP eligibility operation through Gateway" "$PROXY_URL/services/eligibility" \
   -X POST \
   -H "Content-Type: text/xml; charset=utf-8" \
   -H 'SOAPAction: ""' \

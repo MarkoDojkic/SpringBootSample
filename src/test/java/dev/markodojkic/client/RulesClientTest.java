@@ -14,8 +14,9 @@ class RulesClientTest {
 
     @Test
     void shouldUseFeignClientContract() {
-        when(client.evaluate(42)).thenReturn("adult");
-        assertEquals("adult", client.evaluate(42));
+        RulesClient.RuleResult result = new RulesClient.RuleResult(42, "ADULT");
+        when(client.evaluate(42)).thenReturn(result);
+        assertEquals(result, client.evaluate(42));
         verify(client).evaluate(42);
     }
 }

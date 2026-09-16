@@ -1,0 +1,13 @@
+package rules
+
+rule "Adult"
+when
+    $p : dev.markodojkic.ruleservice.RuleEvaluationService.RuleInput(age >= 18, age < 65)
+then
+end
+
+rule "Senior"
+when
+    $p : dev.markodojkic.ruleservice.RuleEvaluationService.RuleInput(age >= 65)
+then
+end

@@ -8,7 +8,11 @@
   "variable": [
     {
       "key": "baseUrl",
-      "value": "https://cuddly-invention-qp4555jvp4wh4v6j-8080.app.github.dev"
+      "value": "https://cuddly-invention-qp4555jvp4wh4v6j-8088.app.github.dev"
+    },
+    {
+      "key": "gatewayUrl",
+      "value": "https://cuddly-invention-qp4555jvp4wh4v6j-8088.app.github.dev"
     },
     {
       "key": "username",
@@ -83,6 +87,29 @@
         "url": {
           "raw": "{{baseUrl}}/api/rules/evaluate?age=42",
           "host": ["{{baseUrl}}"],
+          "path": ["api", "rules", "evaluate"],
+          "query": [
+            {
+              "key": "age",
+              "value": "42"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Evaluate rule through Eureka Gateway",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{gatewayUrl}}/api/rules/evaluate?age=42",
+          "host": ["{{gatewayUrl}}"],
           "path": ["api", "rules", "evaluate"],
           "query": [
             {

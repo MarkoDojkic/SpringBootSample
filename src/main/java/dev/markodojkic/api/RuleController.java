@@ -1,19 +1,19 @@
 package dev.markodojkic.api;
 
-import dev.markodojkic.rules.RuleService;
+import dev.markodojkic.client.RulesClient;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/rules")
 public class RuleController {
-    private final RuleService ruleService;
+    private final RulesClient rulesClient;
 
-    public RuleController(RuleService ruleService) {
-        this.ruleService = ruleService;
+    public RuleController(RulesClient rulesClient) {
+        this.rulesClient = rulesClient;
     }
 
     @GetMapping("/evaluate")
-    public RuleService.RuleResult evaluate(@RequestParam(name = "age") int age) {
-        return ruleService.evaluate(age);
+    public RulesClient.RuleResult evaluate(@RequestParam(name = "age") int age) {
+        return rulesClient.evaluate(age);
     }
 }
