@@ -21,7 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/reports")
 public class ReportController {
     @GetMapping(value = "/eligibility", produces = MediaType.APPLICATION_PDF_VALUE)
-    public ResponseEntity<byte[]> eligibility(@RequestParam String patientId) throws IOException, JRException {
+    public ResponseEntity<byte[]> eligibility(
+            @RequestParam(name = "patientId") String patientId) throws IOException, JRException {
         ClassPathResource template = new ClassPathResource("reports/eligibility.jrxml");
         JasperReport report;
         try (InputStream input = template.getInputStream()) {

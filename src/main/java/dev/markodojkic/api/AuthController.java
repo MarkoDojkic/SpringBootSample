@@ -14,7 +14,8 @@ public class AuthController {
     }
 
     @PostMapping("/token")
-    public Map<String, String> token(@RequestParam(defaultValue = "demo-user") String username) {
+    public Map<String, String> token(
+            @RequestParam(name = "username", defaultValue = "demo-user") String username) {
         return Map.of("token", jwtService.generate(username));
     }
 }

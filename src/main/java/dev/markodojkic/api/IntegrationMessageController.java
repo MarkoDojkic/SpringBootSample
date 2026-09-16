@@ -29,7 +29,8 @@ public class IntegrationMessageController {
     }
 
     @GetMapping("/search")
-    public List<IntegrationMessage> search(@org.springframework.web.bind.annotation.RequestParam String text) {
+    public List<IntegrationMessage> search(
+            @org.springframework.web.bind.annotation.RequestParam(name = "text") String text) {
         return repository.findAll(IntegrationMessageSpecifications.messageContains(text));
     }
 
@@ -41,7 +42,8 @@ public class IntegrationMessageController {
     }
 
     @PutMapping("/{id}")
-    public IntegrationMessage update(@PathVariable Long id, @RequestBody CreateMessageRequest request) {
+    public IntegrationMessage update(
+            @PathVariable(name = "id") Long id, @RequestBody CreateMessageRequest request) {
         IntegrationMessage message = repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Message not found: " + id));
         message.setMessage(request.message());

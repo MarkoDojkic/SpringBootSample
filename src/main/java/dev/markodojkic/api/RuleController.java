@@ -13,7 +13,7 @@ public class RuleController {
     }
 
     @GetMapping("/evaluate")
-    public RuleService.RuleResult evaluate(@RequestParam int age) {
+    public RuleService.RuleResult evaluate(@RequestParam(name = "age") int age) {
         return ruleService.evaluate(age);
     }
 }
