@@ -210,3 +210,26 @@ To test a different target or patient:
 ```bash
 GRPC_TARGET=localhost:9090 PATIENT_ID=456 ./scripts/grpc-smoke-test.sh
 ```
+
+### Complete integration smoke test
+
+Run the full HTTP, security, messaging, SOAP, reporting, service discovery,
+configuration, and native gRPC flow:
+
+```bash
+chmod +x scripts/integration-smoke-test.sh
+./scripts/integration-smoke-test.sh
+```
+
+The script prints styled `[ OK ]` or `[FAIL]` results and writes detailed
+command output, including generated PDF files, under `logs/`.
+
+Run the same flow with C3P0 by rebuilding the application with the alternate
+profile:
+
+```bash
+SPRING_PROFILES_ACTIVE=c3p0 docker compose up -d --build --force-recreate enterprise-service
+POOL_PROFILE=c3p0 ./scripts/integration-smoke-test.sh
+```
+
+The C3P0 profile uses the same Compose Oracle datasource variables as HikariCP.
