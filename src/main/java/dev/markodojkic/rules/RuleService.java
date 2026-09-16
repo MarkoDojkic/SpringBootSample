@@ -3,6 +3,7 @@ package dev.markodojkic.rules;
 import org.kie.api.KieServices;
 import org.kie.api.runtime.KieSession;
 import org.springframework.stereotype.Service;
+import org.springframework.cache.annotation.Cacheable;
 
 @Service
 public class RuleService {
@@ -20,6 +21,7 @@ public class RuleService {
 
     public record RuleResult(int age, String category) {}
 
+    @Cacheable(cacheNames = "rule-evaluations", key = "#age")
     public RuleResult evaluate(int age) {
         RuleInput input = new RuleInput(age);
         KieServices ks = KieServices.Factory.get();
