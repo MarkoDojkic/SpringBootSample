@@ -234,6 +234,43 @@
       }
     },
     {
+      "name": "Publish integration event (RabbitMQ + Kafka)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"message\": \"integration event from Postman\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/integrations/events",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "integrations", "events"]
+        }
+      }
+    },
+    {
+      "name": "Prometheus metrics",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/actuator/prometheus",
+          "host": ["{{baseUrl}}"],
+          "path": ["actuator", "prometheus"]
+        }
+      }
+    },
+    {
       "name": "SOAP WSDL",
       "request": {
         "method": "GET",

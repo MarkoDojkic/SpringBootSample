@@ -7,6 +7,8 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -14,10 +16,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtFilter,
-                                            ObjectProvider<org.springframework.security.authentication.AuthenticationProvider> ldapProvider)
+                                            ObjectProvider<org.springframework.security.authentication.AuthenticationProvider> ldapProvider,
+                                            ObjectProvider<JwtDecoder> jwtDecoder)
             throws Exception {
         ldapProvider.ifAvailable(http::authenticationProvider);
-        return http
+        http
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
@@ -25,8 +28,13 @@ public class SecurityConfig {
                                 "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/ws/**",
                                 "/services/**").permitAll()
                         .anyRequest().authenticated())
-                .httpBasic(Customizer.withDefaults())
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();
+                .httpBasic(Customizer.withDefaults());
+        if (jwtDecoder.getIfAvailable() != null) {
+            http.addFilterBefore(jwtFilter, BearerTokenAuthenticationFilter.class)
+                    .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
+        } else {
+            http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+        }
+        return http.build();
     }
 }

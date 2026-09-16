@@ -44,8 +44,8 @@ mvn -f config-server/pom.xml package -DskipTests
 Then build the runtime images and start the stack:
 
 ```bash
-docker compose build
-docker compose up
+docker compose build --no-cache enterprise-service
+docker compose up -d
 ```
 
 Compose does not run Maven. The Dockerfiles only copy the existing JARs from
@@ -80,6 +80,8 @@ mvn spring-boot:run
 The default datasource profile is HikariCP. To use C3P0:
 
 ```bash
+# PowerShell
+$env:JASYPT_ENCRYPTOR_PASSWORD="change-this-local-development-password"
 mvn spring-boot:run -Dspring-boot.run.profiles=c3p0
 ```
 
@@ -94,9 +96,74 @@ GET  /api/messages
 GET  /api/messages/search?text=hello
 POST /api/messages        {"message":"hello","secretText":"private","secretDate":"2026-01-01T00:00:00Z","secretBytes":"c2Vuc2l0aXZl"}
 PUT  /api/messages/{id}   {"message":"updated"}
+POST /api/integrations/events {"message":"hello from both brokers"}
 ```
 
 The report endpoint returns a JasperReports-generated PDF. Liquibase creates and seeds `integration_message` on startup. LDAP is enabled in Compose and can be disabled locally with `APP_LDAP_ENABLED=false`. Replace development secrets and externalize credentials before production use.
+
+## Integration verification
+
+The following commands assume `docker compose up -d` has completed. On Windows use
+`curl.exe` (PowerShell's `curl` alias is different).
+
+```powershell
+# Actuator and Prometheus
+curl.exe http://localhost:8080/actuator/health
+curl.exe http://localhost:8080/actuator/prometheus
+
+# OAuth2 resource server using the Compose Keycloak master realm
+$keycloakPassword = "admin"
+$token = (curl.exe -s -X POST http://localhost:8081/realms/master/protocol/openid-connect/token `
+  -H "Content-Type: application/x-www-form-urlencoded" `
+  -d "client_id=admin-cli" -d "username=admin" -d ("password={0}" -f $keycloakPassword) `
+  -d "grant_type=password" | ConvertFrom-Json).access_token
+$authHeader = "Authorization: Bearer {0}" -f $token
+curl.exe -H $authHeader http://localhost:8080/api/messages
+
+# LDAP authentication (seeded by ldap/bootstrap.ldif)
+curl.exe -u demo-user:demo-password http://localhost:8080/api/messages
+
+# RabbitMQ and Kafka (the response reports which publishers are enabled)
+curl.exe -X POST http://localhost:8080/api/integrations/events `
+  -H $authHeader -H "Content-Type: application/json" `
+  -d '{"message":"integration smoke test"}'
+docker compose exec kafka /opt/kafka/bin/kafka-console-consumer.sh `
+  --bootstrap-server kafka:9092 --topic enterprise.events --from-beginning --max-messages 1
+
+# Eureka and Config Server
+curl.exe http://localhost:8761/eureka/apps/enterprise-service
+curl.exe http://localhost:8888/enterprise-service/hikari
+
+# JasperReports PDF
+curl.exe -o eligibility.pdf -H $authHeader `
+  "http://localhost:8080/api/reports/eligibility?patientId=123"
+
+# Native gRPC reflection, health, and eligibility RPC
+grpcurl.exe -plaintext localhost:9090 list
+grpcurl.exe -plaintext -d '{"patientId":"123"}' localhost:9090 `
+  EligibilityGrpcService/CheckEligibility
+
+# Quartz executions are logged every 30 seconds by ExampleQuartzJob.
+docker compose logs --since=1m enterprise-service | Select-String "Quartz job executed"
+```
+
+The Compose enterprise container uses the Codespaces host gateway
+(`host.docker.internal`) for published dependency ports because Docker bridge
+traffic is not reliable in this environment. For local execution, start the
+dependencies and enable Kafka explicitly:
+
+```powershell
+$env:APP_MESSAGING_KAFKA_ENABLED="true"
+$env:APP_LDAP_ENABLED="true"
+$env:JASYPT_ENCRYPTOR_PASSWORD="change-this-local-development-password"
+mvn spring-boot:run
+```
+
+Creating or updating a message through `/api/messages` produces an Envers
+revision in `integration_message_aud`; the `created_at` and `updated_at`
+columns demonstrate Spring Data auditing. The application exposes native
+gRPC reflection, health, and `EligibilityGrpcService/CheckEligibility` on
+port `9090`. SAML and gRPC-Web are intentionally not included.
 
 ### Jasypt encryption key
 

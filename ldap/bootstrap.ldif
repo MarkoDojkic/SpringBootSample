@@ -1,0 +1,19 @@
+dn: ou=people,dc=example,dc=org
+objectClass: organizationalUnit
+ou: people
+
+dn: ou=groups,dc=example,dc=org
+objectClass: organizationalUnit
+ou: groups
+
+dn: uid=demo-user,ou=people,dc=example,dc=org
+objectClass: inetOrgPerson
+uid: demo-user
+cn: Demo User
+sn: User
+userPassword: demo-password
+
+dn: cn=users,ou=groups,dc=example,dc=org
+objectClass: groupOfNames
+cn: users
+member: uid=demo-user,ou=people,dc=example,dc=org

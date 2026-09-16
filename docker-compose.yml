@@ -10,6 +10,8 @@ services:
         condition: service_healthy
       openldap:
         condition: service_started
+      keycloak:
+        condition: service_started
       rabbitmq:
         condition: service_healthy
       kafka:
@@ -21,6 +23,7 @@ services:
     environment:
       SPRING_RABBITMQ_HOST: host.docker.internal
       SPRING_KAFKA_BOOTSTRAP_SERVERS: host.docker.internal:9092
+      APP_MESSAGING_KAFKA_ENABLED: "true"
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://host.docker.internal:8761/eureka/
       CONFIG_SERVER_URL: http://host.docker.internal:8888
       SPRING_DATASOURCE_URL: jdbc:oracle:thin:@host.docker.internal:1521/FREEPDB1
@@ -34,6 +37,7 @@ services:
       LDAP_BASE: dc=example,dc=org
       LDAP_MANAGER_DN: cn=admin,dc=example,dc=org
       LDAP_MANAGER_PASSWORD: admin
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://host.docker.internal:8081/realms/master/protocol/openid-connect/certs
     ports:
       - "8080:8080"
       - "9090:9090"
@@ -142,6 +146,8 @@ services:
       LDAP_TLS: "false"
     ports:
       - "10389:389"
+    volumes:
+      - ./ldap/bootstrap.ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom/01-demo.ldif:ro
 
 networks:
   default:

@@ -32,7 +32,7 @@ public class ReportController {
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("patientId", patientId);
         JasperPrint print = JasperFillManager.fillReport(
-                report, parameters, new net.sf.jasperreports.engine.JREmptyDataSource());
+                report, new HashMap<>(parameters), new net.sf.jasperreports.engine.JREmptyDataSource());
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(JasperExportManager.exportReportToPdf(print));
