@@ -34,14 +34,15 @@ Reference application built for **Java 17** and Spring Boot 3.5.16. It combines 
 
 ## Run with Docker Compose
 
-Build the enterprise application, reusable base modules, and rules service from the
-root reactor:
+Build the reusable base modules first, then the enterprise application and
+independent services:
 
 ```bash
+mvn -f base/pom.xml clean install
 mvn clean package -DskipTests
-mvn -f base/pom.xml test
 mvn -f discovery-server/pom.xml package -DskipTests
 mvn -f config-server/pom.xml package -DskipTests
+mvn -f rules-service/pom.xml package -DskipTests
 mvn -f gateway/pom.xml package -DskipTests
 ```
 
