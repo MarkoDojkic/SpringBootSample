@@ -2,6 +2,7 @@ package dev.markodojkic.api;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
@@ -28,7 +29,10 @@ public class ReportController {
         try (InputStream input = template.getInputStream()) {
             report = JasperCompileManager.compileReport(input);
         }
-        JasperPrint print = JasperFillManager.fillReport(report, Map.of("patientId", patientId), new net.sf.jasperreports.engine.JREmptyDataSource());
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("patientId", patientId);
+        JasperPrint print = JasperFillManager.fillReport(
+                report, parameters, new net.sf.jasperreports.engine.JREmptyDataSource());
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(JasperExportManager.exportReportToPdf(print));

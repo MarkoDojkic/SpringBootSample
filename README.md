@@ -120,9 +120,26 @@ Postman Desktop supports gRPC. The collection includes a request using the forwa
 }
 ```
 
-Alternatively install `grpcurl` on Windows with and use the forwarded host:
+Alternatively, install `grpcurl` on Windows and use the forwarded host:
 
 ```powershell
 winget install grpcurl.grpcurl
 grpcurl -insecure turbo-tribble-rp6555q77jpfp5jq-9090.app.github.dev:443 list
+```
+
+### Docker gRPC smoke test
+
+In GitHub Codespaces, with the enterprise service running and port `9090` published:
+
+```bash
+chmod +x scripts/grpc-smoke-test.sh
+./scripts/grpc-smoke-test.sh
+```
+
+The script uses the `fullstorydev/grpcurl` Docker image and verifies reflection,
+the standard gRPC health service, and `EligibilityGrpcService/CheckEligibility`.
+To test a different target or patient:
+
+```bash
+GRPC_TARGET=localhost:9090 PATIENT_ID=456 ./scripts/grpc-smoke-test.sh
 ```
