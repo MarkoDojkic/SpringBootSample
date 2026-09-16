@@ -10,11 +10,21 @@
     <artifactId>rules-service</artifactId>
     <properties>
         <java.version>17</java.version>
+        <base.version>1.0.0-SNAPSHOT</base.version>
         <spring-cloud.version>2025.0.1</spring-cloud.version>
-        <drools.version>10.1.0</drools.version>
     </properties>
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>dev.markodojkic</groupId>
+                <artifactId>base-aspect</artifactId>
+                <version>${base.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.markodojkic</groupId>
+                <artifactId>base-drools</artifactId>
+                <version>${base.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
@@ -41,26 +51,6 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.drools</groupId>
-            <artifactId>drools-engine</artifactId>
-            <version>${drools.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.drools</groupId>
-            <artifactId>drools-mvel</artifactId>
-            <version>${drools.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.drools</groupId>
-            <artifactId>drools-xml-support</artifactId>
-            <version>${drools.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.kie</groupId>
-            <artifactId>kie-api</artifactId>
-            <version>${drools.version}</version>
-        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -75,6 +65,49 @@
                     <release>${java.version}</release>
                     <parameters>true</parameters>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>aspectj-maven-plugin</artifactId>
+                <version>1.15.0</version>
+                <configuration>
+                    <complianceLevel>${java.version}</complianceLevel>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <forceAjcCompile>true</forceAjcCompile>
+                    <showWeaveInfo>true</showWeaveInfo>
+                    <verbose>false</verbose>
+                    <Xlint>warning</Xlint>
+                    <aspectLibraries>
+                        <aspectLibrary>
+                            <groupId>dev.markodojkic</groupId>
+                            <artifactId>base-aspect</artifactId>
+                        </aspectLibrary>
+                    </aspectLibraries>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.aspectj</groupId>
+                        <artifactId>aspectjtools</artifactId>
+                        <version>1.9.25</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <id>aspectj-compile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>aspectj-test-compile</id>
+                        <phase>process-test-classes</phase>
+                        <goals>
+                            <goal>test-compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

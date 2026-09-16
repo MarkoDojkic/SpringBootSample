@@ -1,12 +1,18 @@
 package dev.markodojkic.ruleservice;
 
-import org.kie.api.KieServices;
+import dev.markodojkic.base.drools.DroolsSessionFactory;
 import org.kie.api.runtime.KieSession;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
 public class RuleEvaluationService {
+    private final DroolsSessionFactory sessionFactory;
+
+    public RuleEvaluationService(DroolsSessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
+
     public static final class RuleInput {
         private final int age;
 
@@ -25,8 +31,7 @@ public class RuleEvaluationService {
     @Cacheable(cacheNames = "rule-evaluations", key = "#p0")
     public RuleResult evaluate(int age) {
         RuleInput input = new RuleInput(age);
-        KieServices services = KieServices.Factory.get();
-        try (KieSession session = services.newKieClasspathContainer().newKieSession("rulesSession")) {
+        try (KieSession session = sessionFactory.create("rulesSession")) {
             session.insert(input);
             session.fireAllRules();
             return new RuleResult(input.getAge(), category(input.getAge()));

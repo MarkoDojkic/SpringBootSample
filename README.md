@@ -19,7 +19,8 @@ Reference application built for **Java 17** and Spring Boot 3.5.16. It combines 
 - Spring Cloud Config Server
 - Oracle Database with Liquibase migrations and seed data
 - Optional LDAP authentication
-- AspectJ compile-time weaving (CTW)
+- Reusable Spring Boot auto-configuration modules under `base/` for datasource pools,
+  cross-cutting JPA auditing, Spring AOP audit logging, and Drools session creation
 - SpringDoc OpenAPI and Micrometer Prometheus metrics
 - JasperReports **7.0.8** PDF reporting
 - JUnit 5, Mockito, and Spring Security test support
@@ -33,13 +34,14 @@ Reference application built for **Java 17** and Spring Boot 3.5.16. It combines 
 
 ## Run with Docker Compose
 
-Build all JARs locally first:
+Build the enterprise application, reusable base modules, and rules service from the
+root reactor:
 
 ```bash
 mvn clean package -DskipTests
+mvn -f base/pom.xml test
 mvn -f discovery-server/pom.xml package -DskipTests
 mvn -f config-server/pom.xml package -DskipTests
-mvn -f rules-service/pom.xml package -DskipTests
 mvn -f gateway/pom.xml package -DskipTests
 ```
 
@@ -243,3 +245,19 @@ POOL_PROFILE=c3p0 ./scripts/integration-smoke-test.sh
 ```
 
 The C3P0 profile uses the same Compose Oracle datasource variables as HikariCP.
+
+## Reusable base modules
+
+`base/` is a Maven parent/aggregator containing:
+
+- `base-audit`: enables Spring Data JPA auditing when JPA is present.
+- `base-datasource`: creates HikariCP by default or C3P0 when
+  `app.datasource.pool=c3p0`.
+- `base-aspect`: provides the existing audit timing aspect through Spring AOP.
+- `base-drools`: provides the shared KIE session factory used by both applications.
+
+Envers annotations and the `RevInfo` revision entity remain in the enterprise
+application because they are coupled to its entity/revision table mappings.
+`base-audit` therefore supplies cross-cutting Spring Data auditing only. The
+audit aspect uses runtime Spring AOP; the AspectJ compiler remains configured for
+the source modules, but this project does not claim compile-time weaving.
