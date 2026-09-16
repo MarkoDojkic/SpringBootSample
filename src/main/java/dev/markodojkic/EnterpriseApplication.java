@@ -5,11 +5,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.cache.annotation.EnableCaching;
 
 @SpringBootApplication
 @EnableFeignClients
 @EnableScheduling
 @EnableJpaAuditing
+@EnableCaching
 public class EnterpriseApplication {
     public static void main(String[] args) {
         SpringApplication.run(EnterpriseApplication.class, args);

@@ -7,6 +7,7 @@ Reference application built for **Java 17** and Spring Boot 3.5.16. It combines 
 - Spring Web, Validation, Security, AOP, Actuator, JDBC, Quartz, and JPA-compatible datasource configuration
 - JPA entity persistence with generated primary keys, Spring Data auditing, and Hibernate Envers revision history
 - Criteria API repository search and Jasypt encryption converters for strings, dates, and byte arrays
+- Ehcache-backed Spring caching for Drools rule evaluations
 - HikariCP (default) and C3P0 profiles
 - Spring Cloud Eureka client/server and OpenFeign
 - RabbitMQ and Apache Kafka
