@@ -1,5 +1,5 @@
 FROM eclipse-temurin:17-jre
 WORKDIR /app
-COPY config-server/target/config-server-1.0.0-SNAPSHOT.jar app.jar
+COPY config-server/target/*.jar app.jar
 EXPOSE 8888
 ENTRYPOINT ["java", "-jar", "app.jar"]
