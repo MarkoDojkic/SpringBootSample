@@ -3,12 +3,17 @@ databaseChangeLog:
       id: 1
       author: marko
       changes:
+        - createSequence:
+            sequenceName: integration_message_seq
+            startValue: 1
+            incrementBy: 1
         - createTable:
             tableName: integration_message
             columns:
               - column:
                   name: id
-                  type: varchar(64)
+                  type: bigint
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -22,15 +27,84 @@ databaseChangeLog:
                   type: timestamp
                   constraints:
                     nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
         - insert:
             tableName: integration_message
             columns:
-              - column:
-                  name: id
-                  value: seed-1
               - column:
                   name: message
                   value: Initial integration data
               - column:
                   name: created_at
                   valueDate: 2026-01-01T00:00:00
+              - column:
+                  name: updated_at
+                  valueDate: 2026-01-01T00:00:00
+  - changeSet:
+      id: 2
+      author: marko
+      changes:
+        - createTable:
+            tableName: revinfo
+            columns:
+              - column:
+                  name: rev
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: revtstmp
+                  type: bigint
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: integration_message_aud
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: rev
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: revtype
+                  type: smallint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: message
+                  type: varchar(512)
+              - column:
+                  name: created_at
+                  type: timestamp
+              - column:
+                  name: updated_at
+                  type: timestamp
+        - addPrimaryKey:
+            tableName: integration_message_aud
+            columnNames: id, rev
+            constraintName: pk_integration_message_aud
+        - addForeignKeyConstraint:
+            baseTableName: integration_message_aud
+            baseColumnNames: rev
+            referencedTableName: revinfo
+            referencedColumnNames: rev
+            constraintName: fk_integration_message_aud_revinfo
+  - changeSet:
+      id: 3
+      author: marko
+      changes:
+        - createSequence:
+            sequenceName: revinfo_seq
+            startValue: 1
+            incrementBy: 1

@@ -5,6 +5,7 @@ Reference application built for **Java 17** and Spring Boot 3.5.16. It combines 
 ## Included stack
 
 - Spring Web, Validation, Security, AOP, Actuator, JDBC, Quartz, and JPA-compatible datasource configuration
+- JPA entity persistence with generated primary keys, Spring Data auditing, and Hibernate Envers revision history
 - HikariCP (default) and C3P0 profiles
 - Spring Cloud Eureka client/server and OpenFeign
 - RabbitMQ and Apache Kafka
@@ -87,6 +88,9 @@ POST /api/auth/token?username=marko
 POST /api/fhir/patient?familyName=Doe&givenName=Jane
 GET  /api/rules/evaluate?age=42
 GET  /api/reports/eligibility?patientId=123
+GET  /api/messages
+POST /api/messages        {"message":"hello"}
+PUT  /api/messages/{id}   {"message":"updated"}
 ```
 
 The report endpoint returns a JasperReports-generated PDF. Liquibase creates and seeds `integration_message` on startup. LDAP is enabled in Compose and can be disabled locally with `APP_LDAP_ENABLED=false`. Replace development secrets and externalize credentials before production use.
