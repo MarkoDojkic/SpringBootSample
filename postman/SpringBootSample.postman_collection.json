@@ -8,7 +8,7 @@
   "variable": [
     {
       "key": "baseUrl",
-      "value": "https://turbo-tribble-rp6555q77jpfp5jq-8080.app.github.dev"
+      "value": "https://cuddly-invention-qp4555jvp4wh4v6j-8080.app.github.dev"
     },
     {
       "key": "username",
@@ -24,7 +24,7 @@
     },
     {
       "key": "grpcUrl",
-      "value": "grpcs://turbo-tribble-rp6555q77jpfp5jq-9090.app.github.dev"
+      "value": "grpcs://cuddly-invention-qp4555jvp4wh4v6j-9090.app.github.dev"
     }
   ],
   "item": [
