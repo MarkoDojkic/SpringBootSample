@@ -161,54 +161,6 @@ databaseChangeLog:
                   name: secret_bytes
                   type: blob
   - changeSet:
-      id: 7
-      author: marko
-      preConditions:
-        - onFail: HALT
-        - columnExists:
-            tableName: integration_message
-            columnName: secret_text
-        - columnExists:
-            tableName: integration_message
-            columnName: secret_date
-        - columnExists:
-            tableName: integration_message
-            columnName: secret_bytes
-        - columnExists:
-            tableName: integration_message_aud
-            columnName: secret_text
-        - columnExists:
-            tableName: integration_message_aud
-            columnName: secret_date
-        - columnExists:
-            tableName: integration_message_aud
-            columnName: secret_bytes
-      changes:
-        - modifyDataType:
-            tableName: integration_message
-            columnName: secret_text
-            newDataType: clob
-        - modifyDataType:
-            tableName: integration_message
-            columnName: secret_date
-            newDataType: clob
-        - modifyDataType:
-            tableName: integration_message
-            columnName: secret_bytes
-            newDataType: blob
-        - modifyDataType:
-            tableName: integration_message_aud
-            columnName: secret_text
-            newDataType: clob
-        - modifyDataType:
-            tableName: integration_message_aud
-            columnName: secret_date
-            newDataType: clob
-        - modifyDataType:
-            tableName: integration_message_aud
-            columnName: secret_bytes
-            newDataType: blob
-  - changeSet:
       id: 3
       author: marko
       preConditions:
