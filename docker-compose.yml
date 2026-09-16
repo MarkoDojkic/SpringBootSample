@@ -139,3 +139,10 @@ services:
       LDAP_TLS: "false"
     ports:
       - "10389:389"
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.0.0/24
