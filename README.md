@@ -30,11 +30,23 @@ Reference application built for **Java 17** and Spring Boot 3.5.16. It combines 
 
 ## Run with Docker Compose
 
-From this directory:
+Build all JARs locally first:
 
 ```bash
-docker compose up --build
+mvn clean package -DskipTests
+mvn -f discovery-server/pom.xml package -DskipTests
+mvn -f config-server/pom.xml package -DskipTests
 ```
+
+Then build the runtime images and start the stack:
+
+```bash
+docker compose build
+docker compose up
+```
+
+Compose does not run Maven. The Dockerfiles only copy the existing JARs from
+`target/`, `discovery-server/target/`, and `config-server/target/`.
 
 Services and endpoints:
 
