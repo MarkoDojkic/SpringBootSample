@@ -39,7 +39,8 @@ independent services:
 
 ```bash
 mvn -f base/pom.xml clean install
-mvn clean package -DskipTests
+mvn clean test
+mvn package -DskipTests
 mvn -f discovery-server/pom.xml package -DskipTests
 mvn -f config-server/pom.xml package -DskipTests
 mvn -f rules-service/pom.xml package -DskipTests
@@ -56,6 +57,13 @@ docker compose up -d
 Compose does not run Maven. The Dockerfiles only copy the existing JARs from
 `target/`, `discovery-server/target/`, `config-server/target/`,
 `rules-service/target/`, and `gateway/target/`.
+
+Create `.env` before starting Compose and set the required encryption password:
+
+```bash
+cp -n .env.example .env
+# Edit .env and set JASYPT_ENCRYPTOR_PASSWORD
+```
 
 Services and endpoints:
 
@@ -227,25 +235,121 @@ GRPC_TARGET=localhost:9090 PATIENT_ID=456 ./scripts/grpc-smoke-test.sh
 ### Complete integration smoke test
 
 Run the full HTTP, security, messaging, SOAP, reporting, service discovery,
-configuration, and native gRPC flow:
+configuration, document-library, and native gRPC flow:
 
 ```bash
 chmod +x scripts/integration-smoke-test.sh
-./scripts/integration-smoke-test.sh
+POOL_PROFILE=hikari ./scripts/integration-smoke-test.sh
 ```
 
 The script prints styled `[ OK ]` or `[FAIL]` results and writes detailed
-command output, including generated PDF files, under `logs/`.
+command output, including generated PDF, QR, and log files, under `logs/`.
 
-Run the same flow with C3P0 by rebuilding the application with the alternate
-profile:
+The smoke test covers OAuth2, secured APIs, Drools, FHIR, JasperReports, SOAP,
+RabbitMQ, Kafka, service discovery, Prometheus, gateway health, and the Tika,
+PDFBox, iText, Apache POI, and ZXing demo endpoints.
+
+Run the same flow with C3P0 by recreating the enterprise container with the
+alternate profile:
 
 ```bash
 SPRING_PROFILES_ACTIVE=c3p0 docker compose up -d --build --force-recreate enterprise-service
 POOL_PROFILE=c3p0 ./scripts/integration-smoke-test.sh
 ```
 
-The C3P0 profile uses the same Compose Oracle datasource variables as HikariCP.
+`SPRING_PROFILES_ACTIVE` selects the runtime datasource and mapper profile.
+`POOL_PROFILE` labels the smoke-test output; it does not configure Spring.
+
+| Runtime profile | Datasource | DTO mapper |
+|---|---|---|
+| `hikari` | HikariCP | MapStruct |
+| `c3p0` | C3P0 | Dozer |
+
+Run gRPC validation separately:
+
+```bash
+chmod +x scripts/grpc-smoke-test.sh
+GRPC_TARGET=localhost:9090 PATIENT_ID=123 ./scripts/grpc-smoke-test.sh
+```
+
+Switch back to Hikari when finished:
+
+```bash
+SPRING_PROFILES_ACTIVE=hikari docker compose up -d --build --force-recreate enterprise-service
+POOL_PROFILE=hikari ./scripts/integration-smoke-test.sh
+```
+
+### Profile-specific local runs
+
+The main application defaults to Hikari. Run it locally with either profile:
+
+```bash
+JASYPT_ENCRYPTOR_PASSWORD=change-this-local-development-password \
+SPRING_PROFILES_ACTIVE=hikari \
+mvn spring-boot:run
+```
+
+```bash
+JASYPT_ENCRYPTOR_PASSWORD=change-this-local-development-password \
+SPRING_PROFILES_ACTIVE=c3p0 \
+mvn spring-boot:run
+```
+
+The rules service also supports both profiles:
+
+```bash
+SPRING_PROFILES_ACTIVE=hikari \
+mvn -f rules-service/pom.xml spring-boot:run
+```
+
+```bash
+SPRING_PROFILES_ACTIVE=c3p0 \
+mvn -f rules-service/pom.xml spring-boot:run
+```
+
+Verify the rules mapper in either profile:
+
+```bash
+curl -fsS "http://localhost:8090/api/rules/evaluate?age=42"
+```
+
+Expected response:
+
+```json
+{"age":42,"category":"ADULT"}
+```
+
+The main application message endpoints use the same profile-selected mapper:
+
+```text
+GET  /api/messages
+GET  /api/messages/search?text=hello
+POST /api/messages
+PUT  /api/messages/{id}
+```
+
+### Build troubleshooting
+
+The base modules must be installed before compiling `rules-service`:
+
+```bash
+mvn -f base/pom.xml clean install
+mvn -f rules-service/pom.xml clean test
+```
+
+If generated sources or compiler output are stale after changing Lombok,
+MapStruct, Dozer, or AspectJ configuration:
+
+```bash
+rm -rf target rules-service/target
+mvn clean test
+mvn -f rules-service/pom.xml clean test
+```
+
+Lombok and MapStruct are processed by Maven Compiler. AspectJ then weaves the
+compiled classes in `target/classes`; it does not recompile the Java sources.
+This ordering is required because `ajc` does not provide Lombok annotation
+processing.
 
 ## Reusable base modules
 
@@ -260,5 +364,5 @@ The C3P0 profile uses the same Compose Oracle datasource variables as HikariCP.
 Envers annotations and the `RevInfo` revision entity remain in the enterprise
 application because they are coupled to its entity/revision table mappings.
 `base-audit` therefore supplies cross-cutting Spring Data auditing only. The
-audit aspect uses runtime Spring AOP; the AspectJ compiler remains configured for
-the source modules, but this project does not claim compile-time weaving.
+audit aspect uses runtime Spring AOP. The AspectJ Maven plugin is configured to
+weave compiled classes after Maven Compiler processing.
