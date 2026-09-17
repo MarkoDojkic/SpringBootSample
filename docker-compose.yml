@@ -23,12 +23,12 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
-      SPRING_RABBITMQ_HOST: host.docker.internal
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: host.docker.internal:9092
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       APP_MESSAGING_KAFKA_ENABLED: "true"
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://host.docker.internal:8761/eureka/
-      CONFIG_SERVER_URL: http://host.docker.internal:8888
-      SPRING_DATASOURCE_URL: jdbc:oracle:thin:@host.docker.internal:1521/FREEPDB1
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+      CONFIG_SERVER_URL: http://config-server:8888
+      SPRING_DATASOURCE_URL: jdbc:oracle:thin:@oracle:1521/FREEPDB1
       SPRING_DATASOURCE_USERNAME: enterprise
       SPRING_DATASOURCE_PASSWORD: enterprise
       SPRING_DATASOURCE_DRIVER: oracle.jdbc.OracleDriver
@@ -36,11 +36,11 @@ services:
       SPRING_LIQUIBASE_ENABLED: "true"
       JASYPT_ENCRYPTOR_PASSWORD: ${JASYPT_ENCRYPTOR_PASSWORD:?Set JASYPT_ENCRYPTOR_PASSWORD in .env}
       APP_LDAP_ENABLED: "true"
-      LDAP_URL: ldap://host.docker.internal:10389
+      LDAP_URL: ldap://openldap:389
       LDAP_BASE: dc=example,dc=org
       LDAP_MANAGER_DN: cn=admin,dc=example,dc=org
       LDAP_MANAGER_PASSWORD: admin
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://host.docker.internal:8081/realms/master/protocol/openid-connect/certs
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8080/realms/master/protocol/openid-connect/certs
     ports:
       - "8080:8080"
       - "9090:9090"
@@ -52,7 +52,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://host.docker.internal:8761/eureka/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
     ports:
       - "8090:8090"
     depends_on:
@@ -72,8 +72,8 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://host.docker.internal:8761/eureka/
-      CONFIG_SERVER_URL: http://host.docker.internal:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+      CONFIG_SERVER_URL: http://config-server:8888
     ports:
       - "8088:8088"
     depends_on:
