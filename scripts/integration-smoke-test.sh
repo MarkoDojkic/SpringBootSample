@@ -4,7 +4,7 @@ set -uo pipefail
 PROXY_URL="${PROXY_URL:-http://localhost:8088}"
 DIRECT_URL="${DIRECT_URL:-http://localhost:8080}"
 KEYCLOAK_URL="${KEYCLOAK_URL:-http://localhost:8081}"
-POOL_PROFILE="${POOL_PROFILE:-hikari}"
+SPRING_PROFILES_ACTIVE="${SPRING_PROFILES_ACTIVE:-hikari}"
 LOG_DIR="${LOG_DIR:-logs}"
 LOG_FILE="${LOG_DIR}/integration-smoke-$(date +%Y%m%d-%H%M%S).log"
 PDF_FILE="${LOG_DIR}/eligibility-$(date +%Y%m%d-%H%M%S).pdf"
@@ -80,7 +80,7 @@ http_check() {
 }
 
 log "Starting enterprise integration smoke test"
-log "Datasource profile: $POOL_PROFILE"
+log "Datasource profile: $SPRING_PROFILES_ACTIVE"
 log "Log file: $LOG_FILE"
 
 run_check "Compose services are running" docker compose ps

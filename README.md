@@ -237,7 +237,7 @@ Postman Desktop supports gRPC. Use `localhost:9090`, enable server reflection, s
 Alternatively, install `grpcurl` on Windows and use the local gRPC endpoint:
 
 ```powershell
-winget install grpcurl.grpcurl
+winget install fullstorydev.grpcurl
 grpcurl -plaintext localhost:9090 list
 ```
 
@@ -276,7 +276,6 @@ configuration, document-library, and native gRPC flow:
 
 ```bash
 chmod +x scripts/integration-smoke-test.sh
-POOL_PROFILE=hikari ./scripts/integration-smoke-test.sh
 ```
 
 The script prints styled `[ OK ]` or `[FAIL]` results and writes detailed
@@ -300,26 +299,25 @@ Run the same flow with C3P0 by recreating the enterprise container with the
 alternate profile:
 
 ```bash
-SPRING_PROFILES_ACTIVE=c3p0 docker compose up -d --build --force-recreate enterprise-service
-POOL_PROFILE=c3p0 ./scripts/integration-smoke-test.sh
+SPRING_PROFILES_ACTIVE=c3p0 docker compose up -d --build --force-recreate rules-service enterprise-service
 ```
 
 On Windows PowerShell:
 
 ```powershell
 $env:SPRING_PROFILES_ACTIVE="c3p0"
-docker compose up -d --build --force-recreate enterprise-service
-$env:POOL_PROFILE="c3p0"
+docker compose up -d --build --force-recreate rules-service enterprise-service
 .\scripts\integration-smoke-test.bat
 ```
 
 `SPRING_PROFILES_ACTIVE` selects the runtime datasource and mapper profile.
-`POOL_PROFILE` labels the smoke-test output; it does not configure Spring.
-
 | Runtime profile | Datasource | DTO mapper |
 |---|---|---|
 | `hikari` | HikariCP | MapStruct |
-| `c3p0` | C3P0 | Dozer |
+| `c3p0` | C3P0 | Dozer XML mappings |
+
+The `c3p0` profile loads explicit Dozer mapping files from
+`src/main/resources/dozer/` and `rules-service/src/main/resources/dozer/`.
 
 Run gRPC validation separately:
 
@@ -328,19 +326,23 @@ chmod +x scripts/grpc-smoke-test.sh
 GRPC_TARGET=localhost:9090 PATIENT_ID=123 ./scripts/grpc-smoke-test.sh
 ```
 
+```powershell
+$env:GRPC_TARGET="localhost:9090"
+$env:PATIENT_ID="123"
+./scripts/grpc-smoke-test.bat
+```
+
 Switch back to Hikari when finished:
 
 ```bash
-SPRING_PROFILES_ACTIVE=hikari docker compose up -d --build --force-recreate enterprise-service
-POOL_PROFILE=hikari ./scripts/integration-smoke-test.sh
+SPRING_PROFILES_ACTIVE=hikari docker compose up -d --build --force-recreate rules-service enterprise-service
 ```
 
 On Windows PowerShell:
 
 ```powershell
 $env:SPRING_PROFILES_ACTIVE="hikari"
-docker compose up -d --build --force-recreate enterprise-service
-$env:POOL_PROFILE="hikari"
+docker compose up -d --build --force-recreate rules-service enterprise-service
 .\scripts\integration-smoke-test.bat
 ```
 
