@@ -142,6 +142,18 @@ if [[ -n "$TOKEN" ]]; then
     fail "Generated file is a PDF (see $LOG_FILE)"
   fi
 
+  http_check "Tika text detection" "$PROXY_URL/api/demo/tika?text=hello" -H "$AUTH_HEADER"
+
+  http_check "Demo PDF generation" "$PROXY_URL/api/demo/pdf?text=hello" \
+    -H "$AUTH_HEADER" \
+    -o "$LOG_DIR/demo-pdf-$(date +%Y%m%d-%H%M%S).pdf"
+
+  http_check "Demo QR generation" "$PROXY_URL/api/demo/qr?payload=spring-boot-demo" \
+    -H "$AUTH_HEADER" \
+    -o "$LOG_DIR/demo-qr-$(date +%Y%m%d-%H%M%S).png"
+
+  http_check "Demo Excel generation" "$PROXY_URL/api/demo/excel" -H "$AUTH_HEADER"
+
   EVENT_RESPONSE="$(curl -fsS -X POST "$PROXY_URL/api/integrations/events" \
     -H "$AUTH_HEADER" \
     -H "Content-Type: application/json" \

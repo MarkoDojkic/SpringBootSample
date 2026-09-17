@@ -261,6 +261,92 @@
       }
     },
     {
+      "name": "Tika text detection",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "******"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/demo/tika?text=hello",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "demo", "tika"],
+          "query": [
+            {
+              "key": "text",
+              "value": "hello"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Generate demo PDF",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "******"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/demo/pdf?text=hello",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "demo", "pdf"],
+          "query": [
+            {
+              "key": "text",
+              "value": "hello"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Generate demo QR",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "******"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/demo/qr?payload=spring-boot-demo",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "demo", "qr"],
+          "query": [
+            {
+              "key": "payload",
+              "value": "spring-boot-demo"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Generate demo Excel",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "******"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/demo/excel",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "demo", "excel"]
+        }
+      }
+    },
+    {
       "name": "Publish integration event (RabbitMQ + Kafka)",
       "request": {
         "method": "POST",
