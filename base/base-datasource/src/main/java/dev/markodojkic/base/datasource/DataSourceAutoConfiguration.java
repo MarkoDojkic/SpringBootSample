@@ -11,7 +11,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 
-@AutoConfiguration(before = org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration.class)
+@AutoConfiguration(before = org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration.class)
 @ConditionalOnClass(DataSource.class)
 @ConditionalOnMissingBean(DataSource.class)
 public class DataSourceAutoConfiguration {

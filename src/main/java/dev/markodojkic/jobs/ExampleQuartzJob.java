@@ -1,11 +1,11 @@
 package dev.markodojkic.jobs;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import dev.markodojkic.jackson.JacksonUtil;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
-
+import tools.jackson.core.JacksonException;
 import java.util.List;
 
 public class ExampleQuartzJob implements Job {
@@ -63,7 +63,7 @@ public class ExampleQuartzJob implements Job {
             System.out.println("Updated JSON: " + updatedJson);
 
             // deserializeCustomers()
-            ObjectMapper objectMapper = new ObjectMapper();
+            ObjectMapper objectMapper = new JsonMapper();
             String customersJson = objectMapper.writeValueAsString(customers);
 
             List<JacksonUtil.Customer> deserializedCustomers =
@@ -72,7 +72,7 @@ public class ExampleQuartzJob implements Job {
             System.out.println("Deserialized customers: " + deserializedCustomers);
 
             System.out.println("QUARTZ_SMOKE_TEST: Jackson migration example executed");
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new IllegalStateException("Jackson processing failed", e);
         }
     }
