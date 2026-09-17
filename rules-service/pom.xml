@@ -120,13 +120,13 @@
                     <complianceLevel>${java.version}</complianceLevel>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
-                    <forceAjcCompile>true</forceAjcCompile>
                     <showWeaveInfo>true</showWeaveInfo>
                     <verbose>false</verbose>
                     <Xlint>warning</Xlint>
-                    <excludes>
-                        <exclude>**/*MapperImpl.java</exclude>
-                    </excludes>
+                    <sources/>
+                    <weaveDirectories>
+                        <weaveDirectory>${project.build.outputDirectory}</weaveDirectory>
+                    </weaveDirectories>
                     <aspectLibraries>
                         <aspectLibrary>
                             <groupId>dev.markodojkic</groupId>
