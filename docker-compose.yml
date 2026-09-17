@@ -204,10 +204,3 @@ services:
       timeout: 5s
       retries: 30
       start_period: 20s
-
-networks:
-  default:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.30.0.0/24
