@@ -47,6 +47,9 @@ mvn -f rules-service/pom.xml package -DskipTests
 mvn -f gateway/pom.xml package -DskipTests
 ```
 
+The same commands work from Windows PowerShell when Maven and Docker Desktop
+are on `PATH`.
+
 Then build the runtime images and start the stack:
 
 ```bash
@@ -63,6 +66,15 @@ Create `.env` before starting Compose and set the required encryption password:
 ```bash
 cp -n .env.example .env
 # Edit .env and set JASYPT_ENCRYPTOR_PASSWORD
+```
+
+On Windows PowerShell:
+
+```powershell
+if (-not (Test-Path .env)) { Copy-Item .env.example .env }
+# Edit .env and set JASYPT_ENCRYPTOR_PASSWORD
+docker compose build --no-cache
+docker compose up -d
 ```
 
 Services and endpoints:
@@ -86,7 +98,12 @@ Services and endpoints:
 
 ## Run locally
 
-Start Eureka and RabbitMQ/Kafka, then run:
+Docker Compose is the recommended way to run the full stack because it starts
+the application, gateway, service discovery, Config Server, Oracle, LDAP,
+Keycloak, RabbitMQ, and Kafka together.
+
+For local application-only development, start the Compose dependencies first,
+then run:
 
 ```bash
 mvn test
@@ -124,8 +141,19 @@ service and other application routes to `enterprise-service`.
 
 ## Integration verification
 
-The following commands assume `docker compose up -d` has completed. On Windows use
-`curl.exe` (PowerShell's `curl` alias is different).
+The following commands assume `docker compose up -d` has completed.
+
+On Windows, the easiest full verification flow is the batch wrapper:
+
+```powershell
+.\scripts\integration-smoke-test.bat
+```
+
+The wrapper uses Git for Windows Bash when available, keeps the terminal open
+after completion, and writes detailed logs under `logs/`.
+
+To run individual checks on Windows, use `curl.exe` because PowerShell's `curl`
+alias is different.
 
 ```powershell
 # Actuator and Prometheus
@@ -232,6 +260,16 @@ To test a different target or patient:
 GRPC_TARGET=localhost:9090 PATIENT_ID=456 ./scripts/grpc-smoke-test.sh
 ```
 
+On Windows PowerShell, use the batch wrapper:
+
+```powershell
+.\scripts\grpc-smoke-test.bat
+```
+
+The Windows wrapper runs the Bash script through Git Bash when available. The
+script automatically targets `host.docker.internal:9090` from the `grpcurl`
+container so Docker Desktop can reach the published gRPC port.
+
 ### Complete integration smoke test
 
 Run the full HTTP, security, messaging, SOAP, reporting, service discovery,
@@ -249,12 +287,31 @@ The smoke test covers OAuth2, secured APIs, Drools, FHIR, JasperReports, SOAP,
 RabbitMQ, Kafka, service discovery, Prometheus, gateway health, and the Tika,
 PDFBox, iText, Apache POI, and ZXing demo endpoints.
 
+On Windows PowerShell, run the same full flow with:
+
+```powershell
+.\scripts\integration-smoke-test.bat
+```
+
+If the batch file reports that `docker` is unavailable from WSL, install Git for
+Windows or enable Docker Desktop's WSL integration for that distro. The checked
+in wrapper prefers Git Bash to avoid that WSL-specific Docker visibility issue.
+
 Run the same flow with C3P0 by recreating the enterprise container with the
 alternate profile:
 
 ```bash
 SPRING_PROFILES_ACTIVE=c3p0 docker compose up -d --build --force-recreate enterprise-service
 POOL_PROFILE=c3p0 ./scripts/integration-smoke-test.sh
+```
+
+On Windows PowerShell:
+
+```powershell
+$env:SPRING_PROFILES_ACTIVE="c3p0"
+docker compose up -d --build --force-recreate enterprise-service
+$env:POOL_PROFILE="c3p0"
+.\scripts\integration-smoke-test.bat
 ```
 
 `SPRING_PROFILES_ACTIVE` selects the runtime datasource and mapper profile.
@@ -277,6 +334,15 @@ Switch back to Hikari when finished:
 ```bash
 SPRING_PROFILES_ACTIVE=hikari docker compose up -d --build --force-recreate enterprise-service
 POOL_PROFILE=hikari ./scripts/integration-smoke-test.sh
+```
+
+On Windows PowerShell:
+
+```powershell
+$env:SPRING_PROFILES_ACTIVE="hikari"
+docker compose up -d --build --force-recreate enterprise-service
+$env:POOL_PROFILE="hikari"
+.\scripts\integration-smoke-test.bat
 ```
 
 ### Profile-specific local runs

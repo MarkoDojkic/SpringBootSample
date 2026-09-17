@@ -1,12 +1,22 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-GRPC_TARGET="${GRPC_TARGET:-localhost:9090}"
 GRPCURL_IMAGE="${GRPCURL_IMAGE:-fullstorydev/grpcurl:latest}"
 PATIENT_ID="${PATIENT_ID:-123}"
 
+case "$(uname -s 2>/dev/null || printf unknown)" in
+  MINGW*|MSYS*|CYGWIN*)
+    GRPC_TARGET="${GRPC_TARGET:-host.docker.internal:9090}"
+    GRPCURL_DOCKER_ARGS=()
+    ;;
+  *)
+    GRPC_TARGET="${GRPC_TARGET:-localhost:9090}"
+    GRPCURL_DOCKER_ARGS=(--network host)
+    ;;
+esac
+
 grpcurl() {
-  docker run --rm --network host "$GRPCURL_IMAGE" "$@"
+  docker run --rm "${GRPCURL_DOCKER_ARGS[@]}" "$GRPCURL_IMAGE" "$@"
 }
 
 echo "Checking gRPC reflection at ${GRPC_TARGET}..."

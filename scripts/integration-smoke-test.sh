@@ -58,6 +58,16 @@ run_check() {
   fi
 }
 
+json_string_field() {
+  local field="$1"
+  sed -nE "s/.*\"${field}\"[[:space:]]*:[[:space:]]*\"([^\"]*)\".*/\\1/p"
+}
+
+json_number_field() {
+  local field="$1"
+  sed -nE "s/.*\"${field}\"[[:space:]]*:[[:space:]]*([0-9]+).*/\\1/p"
+}
+
 http_check() {
   local name="$1"
   local url="$2"
@@ -85,7 +95,7 @@ if TOKEN_RESPONSE="$(curl -fsS -X POST \
   -d "username=admin" \
   -d "password=admin" \
   -d "grant_type=password" 2>>"$LOG_FILE")"; then
-  TOKEN="$(printf '%s' "$TOKEN_RESPONSE" | jq -r '.access_token // empty' 2>>"$LOG_FILE")"
+  TOKEN="$(printf '%s' "$TOKEN_RESPONSE" | json_string_field access_token)"
 fi
 
 if [[ -n "$TOKEN" ]]; then
@@ -112,7 +122,7 @@ if [[ -n "$TOKEN" ]]; then
     --data "{\"message\":\"integration-smoke-${RUN_ID}\",\"secretText\":\"smoke-${RUN_ID}\",\"secretDate\":\"2026-01-01T00:00:00Z\",\"secretBytes\":\"c21va2U=\"}" \
     2>>"$LOG_FILE")" || MESSAGE_RESPONSE=""
   printf '%s\n' "$MESSAGE_RESPONSE" >> "$LOG_FILE"
-  MESSAGE_ID="$(printf '%s' "$MESSAGE_RESPONSE" | jq -r '.id // empty' 2>>"$LOG_FILE")"
+  MESSAGE_ID="$(printf '%s' "$MESSAGE_RESPONSE" | json_number_field id)"
   if [[ -n "$MESSAGE_ID" ]]; then
     ok "Create integration message (id ${MESSAGE_ID})"
   else
@@ -160,8 +170,8 @@ if [[ -n "$TOKEN" ]]; then
     --data "{\"message\":\"broker-smoke-${RUN_ID}\"}" \
     2>>"$LOG_FILE")" || EVENT_RESPONSE=""
   printf '%s\n' "$EVENT_RESPONSE" >> "$LOG_FILE"
-  if printf '%s' "$EVENT_RESPONSE" | jq -e '.rabbitMq == true and .kafka == true' \
-      >>"$LOG_FILE" 2>&1; then
+  if printf '%s' "$EVENT_RESPONSE" | grep -Eq '"rabbitMq"[[:space:]]*:[[:space:]]*true' &&
+     printf '%s' "$EVENT_RESPONSE" | grep -Eq '"kafka"[[:space:]]*:[[:space:]]*true'; then
     ok "RabbitMQ and Kafka publish endpoint"
   else
     fail "RabbitMQ and Kafka publish endpoint (see $LOG_FILE)"
