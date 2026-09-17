@@ -4,28 +4,27 @@ import dev.markodojkic.base.drools.DroolsSessionFactory;
 import org.kie.api.runtime.KieSession;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class RuleEvaluationService {
     private final DroolsSessionFactory sessionFactory;
 
-    public RuleEvaluationService(DroolsSessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
-    }
-
+    @lombok.Getter
     public static final class RuleInput {
         private final int age;
 
         public RuleInput(int age) {
             this.age = age;
         }
-
-        public int getAge() {
-            return age;
-        }
     }
 
-    public record RuleResult(int age, String category) {
+    @lombok.Data
+    @lombok.AllArgsConstructor
+    public static final class RuleResult {
+        private final int age;
+        private final String category;
     }
 
     @Cacheable(cacheNames = "rule-evaluations", key = "#p0")
