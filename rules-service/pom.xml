@@ -124,6 +124,9 @@
                     <showWeaveInfo>true</showWeaveInfo>
                     <verbose>false</verbose>
                     <Xlint>warning</Xlint>
+                    <excludes>
+                        <exclude>**/*MapperImpl.java</exclude>
+                    </excludes>
                     <aspectLibraries>
                         <aspectLibrary>
                             <groupId>dev.markodojkic</groupId>
