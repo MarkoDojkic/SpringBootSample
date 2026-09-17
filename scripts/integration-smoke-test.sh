@@ -205,6 +205,20 @@ http_check "SOAP eligibility operation through Gateway" "$PROXY_URL/services/eli
 run_check "Native gRPC reflection, health, and RPC" \
   bash ./scripts/grpc-smoke-test.sh
 
+log "Waiting for ExampleQuartzJob execution..."
+
+sleep 35
+
+QUARTZ_LOGS="$(docker compose logs --since=40s enterprise-service 2>>"$LOG_FILE" || true)"
+printf '%s\n' "$QUARTZ_LOGS" >> "$LOG_FILE"
+
+if printf '%s' "$QUARTZ_LOGS" |
+    grep -q "QUARTZ_SMOKE_TEST: Jackson migration example executed"; then
+  ok "ExampleQuartzJob executed"
+else
+  fail "ExampleQuartzJob executed (see $LOG_FILE)"
+fi
+
 log "Completed. Detailed output: $LOG_FILE"
 if [[ "$FAILED" -eq 0 ]]; then
   printf '%b\nALL INTEGRATION CHECKS PASSED%b\n' "$GREEN" "$RESET"
