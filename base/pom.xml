@@ -31,4 +31,18 @@
         <c3p0.version>0.11.2</c3p0.version>
         <aspectj.version>1.9.25</aspectj.version>
     </properties>
+    <build>
+        <plugins>
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>versions-maven-plugin</artifactId>
+            <version>2.22.0</version>
+        </plugin>
+        <plugin>
+            <groupId>org.openrewrite.maven</groupId>
+            <artifactId>rewrite-maven-plugin</artifactId>
+            <version>6.46.1</version>
+        </plugin>
+        </plugins>
+    </build>
 </project>

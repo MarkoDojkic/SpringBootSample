@@ -1,0 +1,8 @@
+type: specs.openrewrite.org/v1beta/recipe
+name: dev.markodojkic.SpringBoot41CommunityMigration
+displayName: Spring Boot 4 Community Migration
+description: Community OpenRewrite migration for Spring Boot 4.
+recipeList:
+  - org.openrewrite.java.spring.boot4.UpgradeSpringBoot_4_0
+  - org.openrewrite.java.spring.data.UpgradeSpringData_4_0
+  - org.openrewrite.java.testing.junit6.JUnit5to6Migration
