@@ -36,6 +36,16 @@
     </dependencyManagement>
     <dependencies>
         <dependency>
+            <groupId>dev.markodojkic</groupId>
+            <artifactId>base-drools</artifactId>
+            <version>${base.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>dev.markodojkic</groupId>
+            <artifactId>base-aspect</artifactId>
+            <version>${base.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
