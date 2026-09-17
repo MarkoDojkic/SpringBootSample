@@ -196,10 +196,8 @@ grpcurl.exe -plaintext -d '{"patientId":"123"}' localhost:9090 `
 docker compose logs --since=1m enterprise-service | Select-String "Quartz job executed"
 ```
 
-The Compose enterprise container uses the Codespaces host gateway
-(`host.docker.internal`) for published dependency ports because Docker bridge
-traffic is not reliable in this environment. For local execution, start the
-dependencies and enable Kafka explicitly:
+For local application-only execution, start the Compose dependencies and enable
+Kafka explicitly:
 
 ```powershell
 $env:APP_MESSAGING_KAFKA_ENABLED="true"
@@ -226,9 +224,9 @@ The `secretText`, `secretDate`, and `secretBytes` entity columns are encrypted b
 
 ## Postman and gRPC
 
-Import `postman/SpringBootSample.postman_collection.json` into Postman Desktop. All HTTP requests use the Spring Cloud Gateway proxy on port `8088`. Run **Get development JWT** first; its test script stores the token for the protected requests. Update the collection `baseUrl` and `gatewayUrl` variables when Codespaces assigns a different forwarded gateway URL.
+Import `postman/SpringBootSample.postman_collection.json` into Postman Desktop. All HTTP requests use the Spring Cloud Gateway proxy on port `8088`. Run **Get development JWT** first; its test script stores the token for the protected requests. The local gateway URL is `http://localhost:8088`.
 
-Postman Desktop supports gRPC. The collection includes a request using the forwarded `9090` host. Use server reflection and select `EligibilityGrpcService/CheckEligibility`, then send:
+Postman Desktop supports gRPC. Use `localhost:9090`, enable server reflection, select `EligibilityGrpcService/CheckEligibility`, then send:
 
 ```json
 {
@@ -236,16 +234,16 @@ Postman Desktop supports gRPC. The collection includes a request using the forwa
 }
 ```
 
-Alternatively, install `grpcurl` on Windows and use the forwarded host:
+Alternatively, install `grpcurl` on Windows and use the local gRPC endpoint:
 
 ```powershell
 winget install grpcurl.grpcurl
-grpcurl -insecure turbo-tribble-rp6555q77jpfp5jq-9090.app.github.dev:443 list
+grpcurl -plaintext localhost:9090 list
 ```
 
 ### Docker gRPC smoke test
 
-In GitHub Codespaces, with the enterprise service running and port `9090` published:
+With the enterprise service running and port `9090` published:
 
 ```bash
 chmod +x scripts/grpc-smoke-test.sh
@@ -254,10 +252,11 @@ chmod +x scripts/grpc-smoke-test.sh
 
 The script uses the `fullstorydev/grpcurl` Docker image and verifies reflection,
 the standard gRPC health service, and `EligibilityGrpcService/CheckEligibility`.
-To test a different target or patient:
+By default, the script finds the Compose network and targets
+`enterprise-service:9090`. To test a different target or patient:
 
 ```bash
-GRPC_TARGET=localhost:9090 PATIENT_ID=456 ./scripts/grpc-smoke-test.sh
+GRPC_TARGET=enterprise-service:9090 PATIENT_ID=456 ./scripts/grpc-smoke-test.sh
 ```
 
 On Windows PowerShell, use the batch wrapper:
@@ -266,9 +265,9 @@ On Windows PowerShell, use the batch wrapper:
 .\scripts\grpc-smoke-test.bat
 ```
 
-The Windows wrapper runs the Bash script through Git Bash when available. The
-script automatically targets `host.docker.internal:9090` from the `grpcurl`
-container so Docker Desktop can reach the published gRPC port.
+The Windows wrapper runs the Bash script through Git Bash when available. It
+uses the Compose network by default, so no WSL Docker integration or special
+host gateway is required.
 
 ### Complete integration smoke test
 

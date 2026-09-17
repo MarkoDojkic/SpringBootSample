@@ -11,7 +11,9 @@ public class C3p0IntegrationMessageMapper implements MessageMapper {
     private final Mapper delegate;
 
     public C3p0IntegrationMessageMapper() {
-        this.delegate = com.github.dozermapper.core.DozerBeanMapperBuilder.create().build();
+        this.delegate = com.github.dozermapper.core.DozerBeanMapperBuilder.create()
+                .withMappingFiles("dozer/integration-message-mapping.xml")
+                .build();
     }
 
     @Override

@@ -3,20 +3,28 @@ set -euo pipefail
 
 GRPCURL_IMAGE="${GRPCURL_IMAGE:-fullstorydev/grpcurl:latest}"
 PATIENT_ID="${PATIENT_ID:-123}"
+GRPC_DOCKER_ARGS=()
 
-case "$(uname -s 2>/dev/null || printf unknown)" in
-  MINGW*|MSYS*|CYGWIN*)
-    GRPC_TARGET="${GRPC_TARGET:-host.docker.internal:9090}"
-    GRPCURL_DOCKER_ARGS=()
-    ;;
-  *)
-    GRPC_TARGET="${GRPC_TARGET:-localhost:9090}"
-    GRPCURL_DOCKER_ARGS=(--network host)
-    ;;
-esac
+if [[ -z "${GRPC_TARGET:-}" ]]; then
+  ENTERPRISE_CONTAINER="$(docker compose ps -q enterprise-service 2>/dev/null || true)"
+  if [[ -n "$ENTERPRISE_CONTAINER" ]]; then
+    COMPOSE_NETWORK="$(docker inspect \
+      --format '{{range $name, $_ := .NetworkSettings.Networks}}{{println $name}}{{end}}' \
+      "$ENTERPRISE_CONTAINER" 2>/dev/null | head -n 1)"
+    if [[ -n "$COMPOSE_NETWORK" ]]; then
+      GRPC_TARGET="enterprise-service:9090"
+      GRPC_DOCKER_ARGS=(--network "$COMPOSE_NETWORK")
+    fi
+  fi
+fi
+
+if [[ -z "${GRPC_TARGET:-}" ]]; then
+  GRPC_TARGET="localhost:9090"
+  GRPC_DOCKER_ARGS=(--network host)
+fi
 
 grpcurl() {
-  docker run --rm "${GRPCURL_DOCKER_ARGS[@]}" "$GRPCURL_IMAGE" "$@"
+  docker run --rm "${GRPC_DOCKER_ARGS[@]}" "$GRPCURL_IMAGE" "$@"
 }
 
 echo "Checking gRPC reflection at ${GRPC_TARGET}..."

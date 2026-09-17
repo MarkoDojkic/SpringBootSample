@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mappings xmlns="http://dozermapper.github.io/schema/bean-mapping"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://dozermapper.github.io/schema/bean-mapping
+                              https://dozermapper.github.io/schema/bean-mapping.xsd">
+    <mapping>
+        <class-a>dev.markodojkic.ruleservice.RuleEvaluationService$RuleResult</class-a>
+        <class-b>dev.markodojkic.ruleservice.RuleResultDto</class-b>
+        <field>
+            <a>age</a>
+            <b>age</b>
+        </field>
+        <field>
+            <a>category</a>
+            <b>category</b>
+        </field>
+    </mapping>
+</mappings>

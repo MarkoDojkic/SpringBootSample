@@ -8,7 +8,9 @@ import org.springframework.stereotype.Component;
 @Profile("c3p0")
 public class C3p0RuleResultMapper implements RuleResultMapper {
     private final Mapper delegate =
-            com.github.dozermapper.core.DozerBeanMapperBuilder.create().build();
+            com.github.dozermapper.core.DozerBeanMapperBuilder.create()
+                    .withMappingFiles("dozer/rule-result-mapping.xml")
+                    .build();
 
     @Override
     public RuleResultDto toDto(RuleEvaluationService.RuleResult result) {
